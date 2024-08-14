@@ -6,6 +6,7 @@ export interface WeatherResponse {
   visibility: number;
   wind: Wind;
   rain?: Rain;
+  snow?: Snow; // Add this line to include the snow data
   clouds: Clouds;
   dt: number;
   sys: Sys;
@@ -45,6 +46,11 @@ export interface Wind {
 }
 
 export interface Rain {
+  '1h': number;
+}
+
+export interface Snow {
+  // Define the Snow interface similarly to Rain
   '1h': number;
 }
 

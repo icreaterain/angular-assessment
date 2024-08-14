@@ -1,4 +1,4 @@
-<div class="p-6 bg-gray-100 min-h-screen">
+<div class="p-6 bg-gray-100 min-h-screen flex flex-col">
   <!-- Toolbar (Title Block) -->
   <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
     <h1 class="text-gray-800">Weather in {{ countryName }}</h1>
@@ -30,7 +30,7 @@
     <span class="block sm:inline">{{ error }}</span>
   </div>
   } @if (weatherData) {
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow">
     <!-- Temperature Card -->
     <mat-card class="mat-elevation-z3">
       <mat-card-header>
@@ -64,27 +64,98 @@
     <!-- Precipitation Card -->
     <mat-card class="mat-elevation-z3">
       <mat-card-header>
-        <mat-card-title class="text-xl font-semibold"
-          >Precipitation</mat-card-title
-        >
+        <mat-card-title class="text-xl font-semibold">
+          Precipitation
+        </mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <div class="text-4xl font-bold text-indigo-600">
-          {{ weatherData.rain?.['1h'] || 0 }} mm/h
+        <div class="text-2xl font-bold text-indigo-600">
+          <mat-card-content>
+            @if (getPrecipitation()) {
+            <div class="text-gray-500">{{ getPrecipitation()?.type }}</div>
+            {{ getPrecipitation()?.value }} {{ getPrecipitation()?.unit }}
+            } @else {
+            <div class="text-xl text-gray-600">No precipitation expected</div>
+            }
+          </mat-card-content>
         </div>
-        <p class="text-gray-500 mt-2">In the last hour</p>
       </mat-card-content>
     </mat-card>
 
-    <!-- Map Card (Nice-to-Have) -->
-    <mat-card class="mat-elevation-z3 col-span-1 md:col-span-2 lg:col-span-3">
+    <!-- Pressure Card -->
+    @if (weatherData.main.pressure) {
+    <mat-card class="mat-elevation-z3">
+      <mat-card-header>
+        <mat-card-title class="text-xl font-semibold">Pressure</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="text-4xl font-bold text-purple-600">
+          {{ weatherData.main.pressure }} hPa
+        </div>
+      </mat-card-content>
+    </mat-card>
+    }
+
+    <!-- Humidity Card -->
+    @if (weatherData.main.humidity) {
+    <mat-card class="mat-elevation-z3">
+      <mat-card-header>
+        <mat-card-title class="text-xl font-semibold">Humidity</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="text-4xl font-bold text-teal-600">
+          {{ weatherData.main.humidity }}%
+        </div>
+      </mat-card-content>
+    </mat-card>
+    }
+
+    <!-- Visibility Card -->
+    @if (weatherData.visibility) {
+    <mat-card class="mat-elevation-z3">
+      <mat-card-header>
+        <mat-card-title class="text-xl font-semibold"
+          >Visibility</mat-card-title
+        >
+      </mat-card-header>
+      <mat-card-content>
+        <div class="text-4xl font-bold text-gray-600">
+          {{ weatherData.visibility / 1000 }} km
+        </div>
+      </mat-card-content>
+    </mat-card>
+    }
+
+    <!-- Sunrise & Sunset Card -->
+    @if (weatherData.sys.sunrise && weatherData.sys.sunset) {
+    <mat-card class="mat-elevation-z3">
+      <mat-card-header>
+        <mat-card-title class="text-xl font-semibold"
+          >Sunrise & Sunset</mat-card-title
+        >
+      </mat-card-header>
+      <mat-card-content>
+        <div class="font-bold text-orange-600">
+          Sunrise: {{ weatherData.sys.sunrise * 1000 | date : "shortTime" }}
+          <br />
+          Sunset: {{ weatherData.sys.sunset * 1000 | date : "shortTime" }}
+        </div>
+      </mat-card-content>
+    </mat-card>
+    }
+
+    <!-- Map Card -->
+    <mat-card
+      class="mat-elevation-z3 col-span-1 md:col-span-2 lg:col-span-3 flex-grow min-h-[640px]"
+    >
       <mat-card-header>
         <mat-card-title class="text-xl font-semibold">Map</mat-card-title>
       </mat-card-header>
-      <mat-card-content>
+      <mat-card-content class="p-0 h-full">
         <div
+          #map
           id="map"
-          style="height: 300px"
+          style="height: 100%"
           class="rounded-lg overflow-hidden"
         ></div>
       </mat-card-content>
