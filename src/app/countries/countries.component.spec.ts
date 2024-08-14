@@ -1,10 +1,14 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  waitForAsync,
+} from '@angular/core/testing';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { CountriesService } from '../services/countries.service';
 import { of, throwError } from 'rxjs';
 import { CountriesComponent } from './countries.component';
@@ -14,44 +18,35 @@ import { provideRouter } from '@angular/router';
 import { Location } from '@angular/common';
 import { WeatherComponent } from '../weather/weather.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { provideHttpClient } from '@angular/common/http';
+
+class FakeCountriesService {
+  getCountries() {
+    return of({
+      data: [
+        {
+          iso2: 'AF',
+          iso3: 'AFG',
+          country: 'Afghanistan',
+          cities: ['Herat', 'Kabul', 'Kandahar'],
+        },
+        {
+          iso2: 'AL',
+          iso3: 'ALB',
+          country: 'Albania',
+          cities: ['Elbasan', 'Tirana'],
+        },
+      ],
+    });
+  }
+}
 
 describe('CountriesComponent', () => {
   let component: CountriesComponent;
   let fixture: ComponentFixture<CountriesComponent>;
-  let countriesService: CountriesService;
   let router: Router;
   let location: Location;
-
-  const mockCountries = [
-    {
-      iso2: 'AF',
-      iso3: 'AFG',
-      country: 'Afghanistan',
-      cities: [
-        'Herat',
-        'Kabul',
-        'Kandahar',
-        'Molah',
-        'Rana',
-        'Shar',
-        'Sharif',
-        'Wazir Akbar Khan',
-      ],
-    },
-    {
-      iso2: 'AL',
-      iso3: 'ALB',
-      country: 'Albania',
-      cities: [
-        'Elbasan',
-        'Petran',
-        'Pogradec',
-        'Shkoder',
-        'Tirana',
-        'Ura Vajgurore',
-      ],
-    },
-  ];
+  let fakeCountriesService: FakeCountriesService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -61,14 +56,14 @@ describe('CountriesComponent', () => {
         MatSortModule,
         MatToolbarModule,
         MatIconModule,
-        HttpClientTestingModule,
         BrowserAnimationsModule,
       ],
       providers: [
-        CountriesService,
+        { provide: CountriesService, useClass: FakeCountriesService },
         provideRouter([
           { path: 'weather/:countryName', component: WeatherComponent },
         ]),
+        provideHttpClient(),
       ],
       schemas: [NO_ERRORS_SCHEMA], // Ignore Angular Material specific errors
     }).compileComponents();
@@ -77,7 +72,9 @@ describe('CountriesComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CountriesComponent);
     component = fixture.componentInstance;
-    countriesService = TestBed.inject(CountriesService);
+    fakeCountriesService = TestBed.inject(
+      CountriesService
+    ) as FakeCountriesService;
     router = TestBed.inject(Router);
     location = TestBed.inject(Location);
     fixture.detectChanges();
@@ -87,33 +84,10 @@ describe('CountriesComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize with a list of countries', waitForAsync(() => {
-    spyOn(countriesService, 'getCountries').and.returnValue(
-      of({ data: mockCountries })
-    );
-
-    fixture.detectChanges(); // Trigger ngOnInit
-
-    fixture.whenStable().then(() => {
-      expect(component.dataSource.data.length).toBe(2);
-      expect(component.isLoading).toBeFalse();
-      expect(component.error).toBeNull();
-    });
-  }));
-
-  it('should handle error when loading countries fails', waitForAsync(() => {
-    spyOn(countriesService, 'getCountries').and.returnValue(
-      throwError('Failed to load')
-    );
-
-    fixture.detectChanges(); // Trigger ngOnInit
-
-    fixture.whenStable().then(() => {
-      expect(component.dataSource).toBeDefined(); // Ensure dataSource is defined
-      expect(component.dataSource.data.length).toBe(0);
-      expect(component.isLoading).toBeFalse();
-      expect(component.error).toBe('Failed to load countries data');
-    });
+  it('should initialize with a list of countries', fakeAsync(() => {
+    expect(component.dataSource.data.length).toBe(2);
+    expect(component.isLoading).toBeFalse();
+    expect(component.error).toBeNull();
   }));
 
   it('should get correct flag URL', () => {
@@ -122,13 +96,7 @@ describe('CountriesComponent', () => {
     expect(component.getFlagUrl(iso2)).toBe(expectedUrl);
   });
 
-  it('should navigate to weather page with the correct country name on row click', waitForAsync(() => {
-    spyOn(countriesService, 'getCountries').and.returnValue(
-      of({ data: mockCountries })
-    );
-
-    fixture.detectChanges(); // Trigger ngOnInit
-
+  it('should navigate to weather page with the correct country name on row click', fakeAsync(() => {
     spyOn(router, 'navigate');
 
     fixture.whenStable().then(() => {

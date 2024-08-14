@@ -21,7 +21,6 @@ import { Country } from '../models/country.model';
     MatIconModule,
   ],
   templateUrl: './countries.component.html',
-  styleUrls: ['./countries.component.scss'],
 })
 export class CountriesComponent implements OnInit {
   displayedColumns: string[] = ['flag', 'country', 'cities'];

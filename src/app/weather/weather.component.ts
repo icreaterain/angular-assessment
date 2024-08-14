@@ -19,7 +19,6 @@ import { CommonModule } from '@angular/common'; // Import CommonModule
 @Component({
   selector: 'app-weather',
   templateUrl: './weather.component.html',
-  styleUrls: ['./weather.component.scss'],
   standalone: true,
   imports: [
     CommonModule, // Add CommonModule here
