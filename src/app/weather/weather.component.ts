@@ -39,6 +39,7 @@ export class WeatherComponent implements OnInit, AfterViewChecked {
   error: string | null = null;
   isLoading = false;
   private map: L.Map | null = null;
+  private mapInitialized = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -55,6 +56,8 @@ export class WeatherComponent implements OnInit, AfterViewChecked {
   ngAfterViewChecked(): void {
     if (!this.map && this.mapContainer) {
       this.initializeMap();
+      this.mapInitialized = true;
+      this.updateMap(); // Ensure map is updated as soon as it's initialized
     }
   }
 
@@ -117,9 +120,20 @@ export class WeatherComponent implements OnInit, AfterViewChecked {
       if (lat && lon) {
         this.map.setView([lat, lon], 6);
 
-        L.marker([lat, lon])
+        const markerIcon = L.icon({
+          iconUrl:
+            'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+          shadowUrl:
+            'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+          iconSize: [25, 41], // size of the icon
+          iconAnchor: [12, 41], // point of the icon which will correspond to marker's location
+          popupAnchor: [1, -34], // point from which the popup should open relative to the iconAnchor
+          shadowSize: [41, 41], // size of the shadow
+        });
+
+        L.marker([lat, lon], { icon: markerIcon })
           .addTo(this.map)
-          .bindPopup(`Weather in ${this.weatherData.name}`)
+          .bindPopup(`${this.weatherData.name}`)
           .openPopup();
       } else {
         console.error('Invalid coordinates received:', this.weatherData.coord);
