@@ -1,1 +1,94 @@
-<p>weather works!</p>
+<div class="p-6 bg-gray-100 min-h-screen">
+  <!-- Toolbar (Title Block) -->
+  <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
+    <h1 class="text-gray-800">Weather in {{ countryName }}</h1>
+    <mat-card-actions>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="toggleUnits()"
+        aria-label="Switch Units"
+      >
+        <mat-icon class="mr-2">{{
+          units === "metric" ? "swap_horiz" : "swap_vert"
+        }}</mat-icon>
+        Switch to {{ units === "metric" ? "Imperial" : "Metric" }}
+      </button>
+    </mat-card-actions>
+  </div>
+
+  @if (isLoading) {
+  <div class="flex justify-center items-center h-48">
+    <mat-spinner></mat-spinner>
+    <p class="text-gray-600 ml-4">Loading weather data...</p>
+  </div>
+  } @if (error) {
+  <div
+    class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6"
+  >
+    <strong class="font-bold">Error:</strong>
+    <span class="block sm:inline">{{ error }}</span>
+  </div>
+  } @if (weatherData) {
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Temperature Card -->
+    <mat-card class="mat-elevation-z3">
+      <mat-card-header>
+        <mat-card-title class="text-xl font-semibold"
+          >Temperature</mat-card-title
+        >
+      </mat-card-header>
+      <mat-card-content>
+        <div class="text-4xl font-bold text-blue-600">
+          {{ weatherData.main.temp }}° {{ units === "metric" ? "C" : "F" }}
+        </div>
+        <p class="text-gray-500 mt-2">
+          Feels like: {{ weatherData.main.feels_like }}°
+        </p>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Wind Card -->
+    <mat-card class="mat-elevation-z3">
+      <mat-card-header>
+        <mat-card-title class="text-xl font-semibold">Wind</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="text-4xl font-bold text-green-600">
+          {{ weatherData.wind.speed }} {{ units === "metric" ? "m/s" : "mph" }}
+        </div>
+        <p class="text-gray-500 mt-2">Direction: {{ weatherData.wind.deg }}°</p>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Precipitation Card -->
+    <mat-card class="mat-elevation-z3">
+      <mat-card-header>
+        <mat-card-title class="text-xl font-semibold"
+          >Precipitation</mat-card-title
+        >
+      </mat-card-header>
+      <mat-card-content>
+        <div class="text-4xl font-bold text-indigo-600">
+          {{ weatherData.rain?.['1h'] || 0 }} mm/h
+        </div>
+        <p class="text-gray-500 mt-2">In the last hour</p>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Map Card (Nice-to-Have) -->
+    <mat-card class="mat-elevation-z3 col-span-1 md:col-span-2 lg:col-span-3">
+      <mat-card-header>
+        <mat-card-title class="text-xl font-semibold">Map</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div
+          id="map"
+          style="height: 300px"
+          class="rounded-lg overflow-hidden"
+        ></div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  }
+</div>

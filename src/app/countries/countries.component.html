@@ -17,8 +17,7 @@
     <div class="text-center py-4 text-red-600">
       {{ error }}
     </div>
-    }
-
+    } @else {
     <!-- Table -->
     <div class="overflow-x-auto">
       <table
@@ -83,6 +82,7 @@
         </ng-container>
       </table>
     </div>
+    }
 
     <!-- Paginator -->
     <mat-paginator

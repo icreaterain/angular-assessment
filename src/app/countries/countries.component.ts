@@ -5,7 +5,7 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router'; // Import Router
+import { Router } from '@angular/router';
 import { CountriesService } from '../services/countries.service';
 import { Country } from '../models/country.model';
 
@@ -25,7 +25,7 @@ import { Country } from '../models/country.model';
 })
 export class CountriesComponent implements OnInit {
   displayedColumns: string[] = ['flag', 'country', 'cities'];
-  dataSource!: MatTableDataSource<Country>;
+  dataSource: MatTableDataSource<Country> = new MatTableDataSource<Country>([]);
   isLoading = true;
   error: string | null = null;
 
